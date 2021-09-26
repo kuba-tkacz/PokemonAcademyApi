@@ -22,7 +22,7 @@ public class PokemonDetailsService {
 
     public PokemonDetails getPokemonDetails(String pokemonName) {
         Pokemon pokemon = pokemonRepository.findByName(pokemonName)
-                .orElseThrow(()-> new NoPokemonFoundException(pokemonName));
+                .orElseThrow(() -> new NoPokemonFoundException(pokemonName));
         PokemonDetailsResponse pokemonDetailsResponse = pokemonDetailsNetworkRepository.fetchPokemonDetails(pokemon.getId());
         PokemonDetails pokemonDetails = pokemonDetailsTransformer.toEntity(pokemonDetailsResponse);
         return pokemonDetails;

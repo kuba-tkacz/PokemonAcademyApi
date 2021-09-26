@@ -36,7 +36,7 @@ public class PokemonListService {
                     .map(pokemonTransformer::toEntity)
                     .collect(Collectors.toList())
             );
-            offset+=limit;
+            offset += limit;
         } while (pokemonListResult.getNext() != null);
         pokemonRepository.saveAll(pokemons);
         return pokemons;

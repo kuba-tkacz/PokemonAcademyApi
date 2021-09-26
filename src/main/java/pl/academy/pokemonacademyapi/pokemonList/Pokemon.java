@@ -12,8 +12,6 @@ public class Pokemon {
     private String url;
 
 
-
-
     public Pokemon() {
     }
 
