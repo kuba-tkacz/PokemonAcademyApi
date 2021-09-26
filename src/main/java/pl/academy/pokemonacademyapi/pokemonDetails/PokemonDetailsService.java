@@ -7,18 +7,19 @@ import pl.academy.pokemonacademyapi.pokemonList.PokemonRepository;
 
 @Service
 public class PokemonDetailsService {
+    private final PokemonDetailsNetworkRepository pokemonDetailsNetworkRepository;
     private final PokemonRepository pokemonRepository;
 
     @Autowired
-    public PokemonDetailsService(PokemonRepository pokemonRepository) {
+    public PokemonDetailsService(PokemonDetailsNetworkRepository pokemonDetailsNetworkRepository, PokemonRepository pokemonRepository) {
         this.pokemonRepository = pokemonRepository;
+        this.pokemonDetailsNetworkRepository = pokemonDetailsNetworkRepository;
     }
 
-    public Pokemon getPokemonDetails(String pokemonName) {
-        Pokemon pokemon = pokemonRepository.findByName(pokemonName).orElseThrow(()->{
-            return new NoPokemonFoundException(pokemonName);
-        });
-        return pokemon;
+    public PokemonDetailsResponse getPokemonDetails(String pokemonName) {
+        Pokemon pokemon = pokemonRepository.findByName(pokemonName)
+                .orElseThrow(()-> new NoPokemonFoundException(pokemonName));
+        return pokemonDetailsNetworkRepository.fetchPokemonDetails(pokemon.getId());
     }
 
 }
