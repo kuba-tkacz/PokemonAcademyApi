@@ -7,6 +7,8 @@ import java.util.List;
 
 @Entity
 public class PokemonDetails {
+    public static final PokemonDetails EMPTY = new PokemonDetails();
+
     @Id
     private String name;
     @Convert(converter = StringListConverter.class)

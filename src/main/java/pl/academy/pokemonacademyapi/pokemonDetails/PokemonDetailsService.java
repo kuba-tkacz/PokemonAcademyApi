@@ -30,13 +30,19 @@ public class PokemonDetailsService {
     public List<PokemonDetails> getListOfPokemonDetails(String pokemonNames) {
         String[] names = pokemonNames.split(",");
         return Arrays.stream(names).map(name -> {
-            return getPokemonDetails(name);
+            try {
+                return getPokemonDetails(name);
+            } catch (NoPokemonFoundException e) {
+                return PokemonDetails.EMPTY;
+            }
+        }).filter(pokemonDetails -> {
+            return pokemonDetails != PokemonDetails.EMPTY;
         }).collect(Collectors.toList());
     }
 
 
     public PokemonDetails getPokemonDetails(String pokemonName) {
-        return pokemonDetailsRepository.findById(pokemonName).orElseGet(()->{
+        return pokemonDetailsRepository.findById(pokemonName).orElseGet(() -> {
             Pokemon pokemon = pokemonRepository.findByName(pokemonName)
                     .orElseThrow(() -> new NoPokemonFoundException(pokemonName));
             PokemonDetailsResponse pokemonDetailsResponse = pokemonDetailsNetworkRepository.fetchPokemonDetails(pokemon.getId());
