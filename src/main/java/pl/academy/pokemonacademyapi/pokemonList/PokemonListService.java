@@ -51,9 +51,7 @@ public class PokemonListService {
         return pokemons;
     }
 
-    public List<PokemonListItem> getPokemonListItems() {
-        int offset = 0;
-        int limit = 20;
+    public List<PokemonListItem> getPokemonListItems(int offset, int limit) {
         Pageable pageable = PageRequest.of(offset, limit);
         List<Pokemon> pokemons = pokemonRepository.findAll(pageable).getContent();
         return pokemons.stream()
