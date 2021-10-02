@@ -1,13 +1,20 @@
 package pl.academy.pokemonacademyapi.pokemonDetails;
 
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.List;
 
+@Entity
 public class PokemonDetails {
+    @Id
+    private String name;
+    @Convert(converter = StringListConverter.class)
     private List<String> abilities;
     private int height;
     private int weight;
-    private String name;
     private String imageUrl;
+    @Convert(converter = StringListConverter.class)
     private List<String> types;
 
     public List<String> getAbilities() {

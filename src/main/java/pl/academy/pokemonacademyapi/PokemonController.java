@@ -31,9 +31,9 @@ class PokemonController {
         return pokemonListService.getPokemonList();
     }
 
-    @GetMapping("/{name}")
-    PokemonDetails getPokemonDetails(@PathVariable String name) {
-        return pokemonDetailsService.getPokemonDetails(name);
+    @GetMapping
+    List<PokemonDetails> getPokemonDetails(@RequestParam String names) {
+        return pokemonDetailsService.getListOfPokemonDetails(names);
     }
 
     @ExceptionHandler(value = NoPokemonFoundException.class)
