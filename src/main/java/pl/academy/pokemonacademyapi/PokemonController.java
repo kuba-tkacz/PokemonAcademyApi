@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import pl.academy.pokemonacademyapi.pokemonDetails.NoPokemonFoundException;
 import pl.academy.pokemonacademyapi.pokemonDetails.PokemonDetails;
 import pl.academy.pokemonacademyapi.pokemonDetails.PokemonDetailsService;
-import pl.academy.pokemonacademyapi.pokemonList.Pokemon;
 import pl.academy.pokemonacademyapi.pokemonList.PokemonListItem;
 import pl.academy.pokemonacademyapi.pokemonList.PokemonListService;
 
