@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.academy.pokemonacademyapi.pokemonDetails.NoPokemonFoundException;
 import pl.academy.pokemonacademyapi.pokemonDetails.PokemonDetails;
 import pl.academy.pokemonacademyapi.pokemonDetails.PokemonDetailsService;
-import pl.academy.pokemonacademyapi.pokemonList.PokemonListItem;
+import pl.academy.pokemonacademyapi.pokemonList.PokemonListEnvelop;
 import pl.academy.pokemonacademyapi.pokemonList.PokemonListService;
 
 import java.util.List;
@@ -28,8 +28,8 @@ class PokemonController {
     }
 
     @GetMapping("/list")
-    List<PokemonListItem> getPokemonItemList(@RequestParam(defaultValue = "0") int offset,
-                                             @RequestParam(defaultValue = "20") int limit) {
+    PokemonListEnvelop getPokemonItemList(@RequestParam(defaultValue = "0") int offset,
+                                          @RequestParam(defaultValue = "20") int limit) {
         return pokemonListService.getPokemonListItems(offset, limit);
     }
 
