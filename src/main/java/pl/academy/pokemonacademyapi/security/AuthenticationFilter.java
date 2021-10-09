@@ -46,7 +46,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        User userFromDb = user.orElseThrow(()->{
+        User userFromDb = user.<NoSuchElementException>orElseThrow(()->{
             throw new NoSuchElementException();
         });
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
