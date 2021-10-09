@@ -18,45 +18,53 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private static final long EXPIRE_TIME = 3_600_000L;
+    private final String signature;
+    private final String tokenType;
+    private final String headerKey;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager) {
+    public AuthenticationFilter(String headerKey, String signature, String tokenType, AuthenticationManager authenticationManager) {
         super(authenticationManager);
         this.authenticationManager = authenticationManager;
+        this.signature = signature;
+        this.tokenType = tokenType;
+        this.headerKey = headerKey;
         setFilterProcessesUrl("/user/signin");
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        User user = null;
+        Optional<User> user = Optional.empty();
         try {
-            user = new ObjectMapper().readValue(request.getInputStream(), User.class);
+            user = Optional.ofNullable(new ObjectMapper().readValue(request.getInputStream(), User.class));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (user != null) {
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    user.getName(),
-                    user.getPassword(),
-                    Collections.emptyList()
-            ));
-        } else {
-            return super.attemptAuthentication(request, response);
-        }
+        User userFromDb = user.orElseThrow(()->{
+            throw new NoSuchElementException();
+        });
+        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                userFromDb.getName(),
+                userFromDb.getPassword(),
+                Collections.emptyList()
+        ));
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         String token = Jwts.builder()
-                .setExpiration(new Date(System.currentTimeMillis() + 3_600_000))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_TIME))
                 .setSubject(((UserWrapper)(authResult.getPrincipal())).getUsername())
-                .signWith(SignatureAlgorithm.HS512, "test_password")
+                .signWith(SignatureAlgorithm.HS512, signature)
                 .compact();
-        response.addHeader("Access-Control-Expose-Headers", "Authorization");
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader("Access-Control-Expose-Headers", headerKey);
+        response.addHeader(headerKey, tokenType + " " + token);
     }
 }
 

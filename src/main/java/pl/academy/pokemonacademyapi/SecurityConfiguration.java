@@ -1,6 +1,7 @@
 package pl.academy.pokemonacademyapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,12 +16,21 @@ import pl.academy.pokemonacademyapi.security.AuthorizationFilter;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
+    private final String headerKey;
+    private final String signature;
+    private final String tokenType;
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfiguration(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public SecurityConfiguration(@Value("${paa.authorization-key}") String headerKey,
+                                 @Value("${paa.signature}") String signature,
+                                 @Value("${paa.token-type}") String tokenType,
+                                 UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
+        this.headerKey = headerKey;
+        this.signature = signature;
+        this.tokenType = tokenType;
     }
 
     @Override
@@ -35,19 +45,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new AuthenticationFilter(authenticationManager()))
-                .addFilter(new AuthorizationFilter(authenticationManager()))
+                .addFilter(new AuthenticationFilter(headerKey, signature, tokenType, authenticationManager()))
+                .addFilter(new AuthorizationFilter(headerKey, signature, tokenType, authenticationManager()))
                 .headers().frameOptions().disable();//obłsuga h2
     }
-
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .withUser("u1").password(passwordEncoder.encode("u1")).roles("user")
-//                .and()
-//                .withUser("u2").password(passwordEncoder.encode("u2")).roles("user");
-//    }
-
 
     @Override
     protected UserDetailsService userDetailsService() {
